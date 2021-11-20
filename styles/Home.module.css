@@ -114,3 +114,25 @@
     flex-direction: column;
   }
 }
+
+.challengeText {
+  padding: 1.5rem;
+  font-size: 1.5rem;
+  color: #888;
+}
+
+.challengeInput {
+  font: inherit;
+  border: 1px solid #eaeaea;
+  padding: 1.5rem;
+  border-radius: 10px;
+  width: 40ch;
+}
+
+.correct {
+  color: black;
+}
+
+.wrong {
+  color: red;
+}
