@@ -1,6 +1,7 @@
 :root {
   --primary: #0070f3;
   --success: #408a58;
+  --off-white: #faf9f6;
 }
 
 html,
@@ -13,6 +14,7 @@ body {
 
 body {
   font-size: 125%;
+  background-color: var(--off-white);
 }
 
 a {

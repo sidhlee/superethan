@@ -128,14 +128,6 @@
   width: 40ch;
 }
 
-.correct {
-  color: black;
-}
-
-.wrong {
-  color: red;
-}
-
 .readingSelect {
   font: inherit;
   margin: 2rem;

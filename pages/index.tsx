@@ -1,11 +1,14 @@
 import Link from 'next/link';
 import Head from 'next/head';
 import Image from 'next/image';
+import Confetti from 'react-confetti';
+
 import styles from '../styles/Home.module.css';
 import { useEffect, useRef, useState } from 'react';
 import { getAllReadings } from '../lib/parse-readings-markdown';
 import Reading from '../types/reading';
 import { getChallengeText, getAllChallengeText } from '../lib/challenge';
+import ChallengeText from '../components/ChallengeText';
 
 type Props = {
   allReadings: Reading[];
@@ -19,26 +22,34 @@ const Home = ({ allReadings }: Props) => {
   const [currentReading, setCurrentReading] = useState(allReadings[0]);
   const [currentChallengeIndex, setCurrentChallengeIndex] = useState(0);
   const [challengeAnswer, setChallengeAnswer] = useState('');
+  const [finishedReading, setFinishedReading] = useState(false);
+
   const allChallengeText = getAllChallengeText(currentReading.content);
   const challengeText = getChallengeText(
     currentReading.content,
     currentChallengeIndex
   );
-  const isAnswerCorrect = challengeAnswer.trim() === challengeText.trim();
+  const isAnswerCorrect = challengeAnswer.trim() === challengeText?.trim();
 
   useEffect(() => {
     inputRef.current?.focus();
     if (typeof window !== 'undefined') {
       const readingFromLocalStorage = localStorage.getItem('currentReading');
-      console.log({ readingFromLocalStorage });
       if (readingFromLocalStorage) {
         setCurrentReading(JSON.parse(readingFromLocalStorage));
       }
     }
   }, []);
 
-  const winChallenge = () => {
+  const finishReading = () => {
+    setFinishedReading(true);
+  };
+
+  const winChallenge = (wonLastChallenge: boolean) => {
     inputRef.current!.value = '';
+    if (wonLastChallenge) {
+      finishReading();
+    }
     setCurrentChallengeIndex((i) => i + 1);
     setChallengeAnswer('');
   };
@@ -48,6 +59,8 @@ const Home = ({ allReadings }: Props) => {
       (reading) => reading.title === e.currentTarget.value
     );
     if (selectedReading) {
+      setFinishedReading(false);
+
       setCurrentReading(selectedReading);
       if (typeof window !== 'undefined') {
         localStorage.setItem('currentReading', JSON.stringify(selectedReading));
@@ -62,7 +75,10 @@ const Home = ({ allReadings }: Props) => {
 
   const handleAnswerSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    winChallenge();
+    const wonLastChallenge =
+      currentChallengeIndex >= allChallengeText.length - 1;
+    winChallenge(wonLastChallenge);
+    inputRef.current?.focus();
   };
 
   const handlePressEnter = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -74,6 +90,7 @@ const Home = ({ allReadings }: Props) => {
       }
     }
   };
+  // TODO: fix error after finishing a reading
 
   return (
     <div className={styles.container}>
@@ -85,7 +102,7 @@ const Home = ({ allReadings }: Props) => {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-
+      {finishedReading && <Confetti />}
       <main className={styles.main}>
         <h1 className={styles.title}>
           Welcome to{' '}
@@ -108,27 +125,20 @@ const Home = ({ allReadings }: Props) => {
             </select>
           </form>
           <p>
-            {currentChallengeIndex + 1} / {allChallengeText.length} (
-            {(
-              ((currentChallengeIndex + 1) / allChallengeText.length) *
-              100
-            ).toFixed(0)}
+            {currentChallengeIndex} / {allChallengeText.length} (
+            {((currentChallengeIndex / allChallengeText.length) * 100).toFixed(
+              0
+            )}
             %)
           </p>
         </div>
 
         <p className={styles.challengeText + ' disable-select'}>
-          {challengeText.split('').map((char, i) => {
-            if (i >= challengeAnswer.length || challengeAnswer.length === 0)
-              return <span key={i}>{char}</span>;
-
-            const match = char === challengeAnswer[i];
-            return (
-              <span key={i} className={match ? styles.correct : styles.wrong}>
-                {char}
-              </span>
-            );
-          })}
+          <ChallengeText
+            challengeText={challengeText}
+            challengeAnswer={challengeAnswer}
+            finishedAllChallenges={finishedReading}
+          />
         </p>
         <form ref={formRef} onSubmit={handleAnswerSubmit}>
           <textarea
