@@ -30,7 +30,6 @@ const Home = ({ allReadings }: Props) => {
     inputRef.current?.focus();
     if (typeof window !== 'undefined') {
       const readingFromLocalStorage = localStorage.getItem('currentReading');
-      console.log({ readingFromLocalStorage });
       if (readingFromLocalStorage) {
         setCurrentReading(JSON.parse(readingFromLocalStorage));
       }
