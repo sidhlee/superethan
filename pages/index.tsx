@@ -27,6 +27,13 @@ const Home = ({ allReadings }: Props) => {
 
   useEffect(() => {
     inputRef.current?.focus();
+    if (typeof window !== 'undefined') {
+      const readingFromLocalStorage = localStorage.getItem('currentReading');
+      console.log({ readingFromLocalStorage });
+      if (readingFromLocalStorage) {
+        setCurrentReading(JSON.parse(readingFromLocalStorage));
+      }
+    }
   }, []);
 
   const winChallenge = () => {
@@ -41,6 +48,9 @@ const Home = ({ allReadings }: Props) => {
     );
     if (selectedReading) {
       setCurrentReading(selectedReading);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('currentReading', JSON.stringify(selectedReading));
+      }
     }
   };
 
@@ -86,6 +96,7 @@ const Home = ({ allReadings }: Props) => {
           <select
             className={styles.readingSelect}
             onChange={handleReadingChange}
+            value={currentReading.title}
           >
             {allReadings.map((reading) => (
               <option key={reading.title} value={reading.title}>
