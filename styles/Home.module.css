@@ -116,7 +116,6 @@
 }
 
 .challengeText {
-  padding: 1.5rem;
   font-size: 1.5rem;
   color: #888;
 }
@@ -165,4 +164,9 @@
   transition: none;
   opacity: 0;
   transform: translateX(-50px) scale(0.5);
+}
+
+.challenge {
+  display: flex;
+  align-items: center;
 }

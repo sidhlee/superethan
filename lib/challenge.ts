@@ -12,8 +12,5 @@ export function getAllChallengeText(currentReadingContent: string) {
     .replace(/\n/g, ' ')
     .split('. ')
     .map((t) => (t + '.').trim());
-
-  console.log(allChallengeText);
-
   return allChallengeText;
 }

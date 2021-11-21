@@ -5,7 +5,7 @@ import styles from '../styles/Home.module.css';
 import { useEffect, useRef, useState } from 'react';
 import { getAllReadings } from '../lib/parse-readings-markdown';
 import Reading from '../types/reading';
-import { getChallengeText } from '../lib/challenge';
+import { getChallengeText, getAllChallengeText } from '../lib/challenge';
 
 type Props = {
   allReadings: Reading[];
@@ -19,6 +19,7 @@ const Home = ({ allReadings }: Props) => {
   const [currentReading, setCurrentReading] = useState(allReadings[0]);
   const [currentChallengeIndex, setCurrentChallengeIndex] = useState(0);
   const [challengeAnswer, setChallengeAnswer] = useState('');
+  const allChallengeText = getAllChallengeText(currentReading.content);
   const challengeText = getChallengeText(
     currentReading.content,
     currentChallengeIndex
@@ -92,21 +93,31 @@ const Home = ({ allReadings }: Props) => {
             <a>SuperEthan!</a>
           </Link>
         </h1>
-        <form>
-          <select
-            className={styles.readingSelect}
-            onChange={handleReadingChange}
-            value={currentReading.title}
-          >
-            {allReadings.map((reading) => (
-              <option key={reading.title} value={reading.title}>
-                {reading.title}
-              </option>
-            ))}
-          </select>
-        </form>
+        <div className={styles.challenge}>
+          <form>
+            <select
+              className={styles.readingSelect}
+              onChange={handleReadingChange}
+              value={currentReading.title}
+            >
+              {allReadings.map((reading) => (
+                <option key={reading.title} value={reading.title}>
+                  {reading.title}
+                </option>
+              ))}
+            </select>
+          </form>
+          <p>
+            {currentChallengeIndex + 1} / {allChallengeText.length} (
+            {(
+              ((currentChallengeIndex + 1) / allChallengeText.length) *
+              100
+            ).toFixed(0)}
+            %)
+          </p>
+        </div>
 
-        <p className={styles.challengeText}>
+        <p className={styles.challengeText + ' disable-select'}>
           {challengeText.split('').map((char, i) => {
             if (i >= challengeAnswer.length || challengeAnswer.length === 0)
               return <span key={i}>{char}</span>;
