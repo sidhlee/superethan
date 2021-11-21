@@ -1,14 +1,13 @@
 ---
-title: 'Robert and the Rocket'
-except: 'A lot of noise was coming from Robert's garage.
-Robert was making a rocket.'
-covertImage: ''
-date: 
-  added: '2021-11-20'
-  published: '1997-02-04'
-author: 
+title: Robert and the Rocket
+except: A lot of noise was coming from Robert's garage. Robert was making a rocket.
+covertImage:
+date:
+  added: 2021-11-20
+  published: 1997-02-04
+author:
   name: Leesa Wldron
-  picture: ''
+  picture:
 ---
 
 A lot of noise was coming from Robert's garage.
