@@ -62,6 +62,7 @@ const Home = ({ allReadings }: Props) => {
   const handleAnswerSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     winChallenge();
+    inputRef.current?.focus();
   };
 
   const handlePressEnter = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
