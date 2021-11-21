@@ -29,7 +29,7 @@
 }
 
 .title a {
-  color: #0070f3;
+  color: var(--primary);
   text-decoration: none;
 }
 
@@ -135,4 +135,34 @@
 
 .wrong {
   color: red;
+}
+
+.readingSelect {
+  font: inherit;
+  margin: 2rem;
+}
+
+.submitButton {
+  display: block;
+  margin-top: 0.5rem;
+  margin-left: auto;
+  padding: 0.5rem 1.5rem;
+  border: 0;
+  border-radius: 10px;
+  text-transform: uppercase;
+  font: inherit;
+  font-weight: bold;
+  font-style: italic;
+  background: var(--success);
+  color: white;
+
+  transition: all 220ms cubic-bezier(0.17, 0.67, 0.28, 1.54);
+  opacity: 1;
+  transform: translateX(0) scale(1);
+}
+
+.submitButton[disabled] {
+  transition: none;
+  opacity: 0;
+  transform: translateX(-50px) scale(0.5);
 }

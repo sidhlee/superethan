@@ -1,33 +1,66 @@
-import type { NextPage } from 'next';
 import Link from 'next/link';
 import Head from 'next/head';
 import Image from 'next/image';
 import styles from '../styles/Home.module.css';
 import { useEffect, useRef, useState } from 'react';
+import { getAllReadings } from '../lib/parse-readings-markdown';
+import Reading from '../types/reading';
+import { getChallengeText } from '../lib/challenge';
 
-const Home: NextPage = () => {
+type Props = {
+  allReadings: Reading[];
+};
+
+const Home = ({ allReadings }: Props) => {
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const submitButtonRef = useRef<HTMLButtonElement>(null);
 
-  const [challengeText, setChallengeText] = useState(
-    "A lot of noise was coming from Robert's garage."
-  );
+  const [currentReading, setCurrentReading] = useState(allReadings[0]);
+  const [currentChallengeIndex, setCurrentChallengeIndex] = useState(0);
   const [challengeAnswer, setChallengeAnswer] = useState('');
+  const challengeText = getChallengeText(
+    currentReading.content,
+    currentChallengeIndex
+  );
+  const isAnswerCorrect = challengeAnswer.trim() === challengeText.trim();
 
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
 
-  const validateChallengeAnswer = (answer: string): boolean => {
-    const textChars = challengeText.split('');
+  const winChallenge = () => {
+    inputRef.current!.value = '';
+    setCurrentChallengeIndex((i) => i + 1);
+    setChallengeAnswer('');
+  };
 
-    return challengeAnswer === challengeText;
+  const handleReadingChange = (e: React.FormEvent<HTMLSelectElement>) => {
+    const selectedReading = allReadings.find(
+      (reading) => reading.title === e.currentTarget.value
+    );
+    if (selectedReading) {
+      setCurrentReading(selectedReading);
+    }
   };
 
   const handleAnswerChange = (e: React.FormEvent<HTMLTextAreaElement>) => {
     const answer = e.currentTarget.value;
-    setChallengeAnswer(answer);
-    const isCorrect = validateChallengeAnswer(answer);
-    if (isCorrect) {
+    setChallengeAnswer(answer.trimStart());
+  };
+
+  const handleAnswerSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    winChallenge();
+  };
+
+  const handlePressEnter = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && e.shiftKey == false) {
+      // prevent line break
+      e.preventDefault();
+      if (challengeAnswer.trim() === challengeText.trim()) {
+        submitButtonRef.current!.click();
+      }
     }
   };
 
@@ -49,10 +82,23 @@ const Home: NextPage = () => {
             <a>SuperEthan!</a>
           </Link>
         </h1>
+        <form>
+          <select
+            className={styles.readingSelect}
+            onChange={handleReadingChange}
+          >
+            {allReadings.map((reading) => (
+              <option key={reading.title} value={reading.title}>
+                {reading.title}
+              </option>
+            ))}
+          </select>
+        </form>
+
         <p className={styles.challengeText}>
           {challengeText.split('').map((char, i) => {
             if (i >= challengeAnswer.length || challengeAnswer.length === 0)
-              return <span>{char}</span>;
+              return <span key={i}>{char}</span>;
 
             const match = char === challengeAnswer[i];
             return (
@@ -62,13 +108,22 @@ const Home: NextPage = () => {
             );
           })}
         </p>
-        <form>
+        <form ref={formRef} onSubmit={handleAnswerSubmit}>
           <textarea
             ref={inputRef}
             className={styles.challengeInput}
             value={challengeAnswer}
             onChange={handleAnswerChange}
+            onKeyDown={handlePressEnter}
           ></textarea>
+          <button
+            className={styles.submitButton}
+            type="submit"
+            ref={submitButtonRef}
+            disabled={!isAnswerCorrect}
+          >
+            Enter!
+          </button>
         </form>
       </main>
 
@@ -89,3 +144,11 @@ const Home: NextPage = () => {
 };
 
 export default Home;
+
+export const getStaticProps = async () => {
+  const allReadings = getAllReadings(['title', 'content']);
+
+  return {
+    props: { allReadings },
+  };
+};
